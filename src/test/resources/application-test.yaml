@@ -1,0 +1,8 @@
+spring:
+  data:
+    mongodb:
+      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
+      auto-index-creation: true
+  mongodb:
+    uri: mongodb://localhost:27017
+    database: reactive-mongo

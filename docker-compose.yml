@@ -1,0 +1,5 @@
+services:
+  mongo:
+    image: mongo:6.0.2-focal
+    ports:
+      - "27017:27017"
