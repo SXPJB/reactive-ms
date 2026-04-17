@@ -3,13 +3,13 @@ package com.fsociety.web.reactive.ms.app.rest.controller.appconfiguration
 import com.fsociety.web.reactive.ms.common.request.AppConfigurationRequest
 import com.fsociety.web.reactive.ms.common.response.AppConfigurationResponse
 import com.fsociety.web.reactive.ms.core.service.AppConfigurationService
-import com.fsociety.web.reactive.ms.domain.entity.AppConfiguration
+import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 
 @RestController
-@RequestMapping("/api/app-configuration")
+@RequestMapping(value = ["/api/{version}/app-configuration"], produces = [APPLICATION_JSON_VALUE], version = "v1")
 class AppConfigurationV1Controller(
     private val appConfigurationService: AppConfigurationService
 ) {
