@@ -12,7 +12,7 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import kotlinx.coroutines.reactive.awaitFirstOrNull
+import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -55,7 +55,7 @@ class AppConfigurationV1ControllerTest(
     @BeforeEach
     suspend fun setupDb() {
         appConfigurationRepository.deleteAll()
-            .awaitFirstOrNull()
+            .awaitSingleOrNull()
     }
 
     private fun url(path: String) = "http://localhost:$port$path"
@@ -68,7 +68,7 @@ class AppConfigurationV1ControllerTest(
             section = "testSection",
         )
 
-        val response = client.post(url("/api/app-configuration")) {
+        val response = client.post(url("/api/v1/app-configuration")) {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
@@ -90,12 +90,12 @@ class AppConfigurationV1ControllerTest(
             section = "list-section",
         )
 
-        client.post(url("/api/app-configuration")) {
+        client.post(url("/api/v1/app-configuration")) {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
 
-        val response = client.get(url("/api/app-configuration/all")) {
+        val response = client.get(url("/api/v1/app-configuration/all")) {
             accept(ContentType.Application.Json)
         }
 
@@ -114,12 +114,12 @@ class AppConfigurationV1ControllerTest(
             section = "lookup-section",
         )
 
-        client.post(url("/api/app-configuration")) {
+        client.post(url("/api/v1/app-configuration")) {
             contentType(ContentType.Application.Json)
             setBody(request)
         }
 
-        val response = client.get(url("/api/app-configuration/${request.key}/${request.section}")) {
+        val response = client.get(url("/api/v1/app-configuration/${request.key}/${request.section}")) {
             accept(ContentType.Application.Json)
         }
 
@@ -133,7 +133,7 @@ class AppConfigurationV1ControllerTest(
 
     @Test
     fun `update happyPath shouldChangeAppConfiguration`() = runTest {
-        val created = client.post(url("/api/app-configuration")) {
+        val created = client.post(url("/api/v1/app-configuration")) {
             contentType(ContentType.Application.Json)
             setBody(
                 AppConfigurationRequest(
@@ -150,7 +150,7 @@ class AppConfigurationV1ControllerTest(
             section = "update-section",
         )
 
-        val response = client.put(url("/api/app-configuration/${created.id}")) {
+        val response = client.put(url("/api/v1/app-configuration/${created.id}")) {
             contentType(ContentType.Application.Json)
             setBody(updatedRequest)
         }
@@ -166,7 +166,7 @@ class AppConfigurationV1ControllerTest(
 
     @Test
     fun `delete happyPath shouldRemoveAppConfiguration`() = runTest {
-        val created = client.post(url("/api/app-configuration")) {
+        val created = client.post(url("/api/v1/app-configuration")) {
             contentType(ContentType.Application.Json)
             setBody(
                 AppConfigurationRequest(
@@ -177,11 +177,11 @@ class AppConfigurationV1ControllerTest(
             )
         }.body<AppConfigurationResponse>()
 
-        val deleteResponse = client.delete(url("/api/app-configuration/${created.id}"))
+        val deleteResponse = client.delete(url("/api/v1/app-configuration/${created.id}"))
 
         assertEquals(HttpStatusCode.NoContent, deleteResponse.status)
 
-        val lookupResponse = client.get(url("/api/app-configuration/${created.key}/${created.section}"))
+        val lookupResponse = client.get(url("/api/v1/app-configuration/${created.key}/${created.section}"))
         assertEquals(HttpStatusCode.NotFound, lookupResponse.status)
     }
 }

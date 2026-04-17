@@ -21,3 +21,8 @@ spring:
   mongodb:
     uri: mongodb://localhost:27017
     database: reactive-mongo
+
+logging:
+  level:
+    com.fsociety.web:
+      reactive.ms.app.config: trace
