@@ -2,9 +2,8 @@ package com.fsociety.web.reactive.ms.domain.repository
 
 
 import com.fsociety.web.reactive.ms.domain.entity.AppConfiguration
-import org.springframework.data.mongodb.repository.ReactiveMongoRepository
-import reactor.core.publisher.Mono
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 
-interface AppConfigurationRepository : ReactiveMongoRepository<AppConfiguration, String> {
-    fun findByKeyAndSection(key: String, section: String): Mono<AppConfiguration>
+interface AppConfigurationRepository : CoroutineCrudRepository<AppConfiguration, String> {
+    suspend fun findByKeyAndSection(key: String, section: String): AppConfiguration?
 }

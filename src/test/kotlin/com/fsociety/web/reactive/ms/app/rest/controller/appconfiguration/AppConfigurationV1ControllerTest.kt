@@ -12,7 +12,6 @@ import io.ktor.client.plugins.logging.*
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.jackson.*
-import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.test.runTest
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -55,7 +54,6 @@ class AppConfigurationV1ControllerTest(
     @BeforeEach
     suspend fun setupDb() {
         appConfigurationRepository.deleteAll()
-            .awaitSingleOrNull()
     }
 
     private fun url(path: String) = "http://localhost:$port$path"

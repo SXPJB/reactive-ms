@@ -5,6 +5,8 @@ import com.fsociety.web.reactive.ms.common.response.AppConfigurationResponse
 import com.fsociety.web.reactive.ms.domain.entity.AppConfiguration
 import com.fsociety.web.reactive.ms.domain.entity.AppConfiguration.Companion.toResponse
 import com.fsociety.web.reactive.ms.domain.helper.AppConfigurationRepositoryHelper
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
 
 @Service
@@ -20,7 +22,7 @@ class AppConfigurationService(
         return appConfigurationRepositoryHelper.update(id, request).toResponse()
     }
 
-    suspend fun findAll(): List<AppConfigurationResponse> {
+    suspend fun findAll(): Flow<AppConfigurationResponse> {
         return appConfigurationRepositoryHelper.findAll().toResponseList()
     }
 
@@ -32,7 +34,7 @@ class AppConfigurationService(
         appConfigurationRepositoryHelper.deleteById(id)
     }
 
-    private fun List<AppConfiguration>.toResponseList(): List<AppConfigurationResponse> {
+    private fun Flow<AppConfiguration>.toResponseList(): Flow<AppConfigurationResponse> {
         return map { it.toResponse() }
     }
 }

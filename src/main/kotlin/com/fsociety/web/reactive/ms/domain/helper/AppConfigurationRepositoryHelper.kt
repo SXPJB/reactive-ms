@@ -5,10 +5,7 @@ import com.fsociety.web.reactive.ms.common.request.AppConfigurationRequest
 import com.fsociety.web.reactive.ms.common.request.AppConfigurationRequest.Companion.toEntity
 import com.fsociety.web.reactive.ms.domain.entity.AppConfiguration
 import com.fsociety.web.reactive.ms.domain.repository.AppConfigurationRepository
-import kotlinx.coroutines.reactive.awaitFirst
-import kotlinx.coroutines.reactive.awaitFirstOrElse
-import kotlinx.coroutines.reactive.awaitSingle
-import kotlinx.coroutines.reactor.awaitSingleOrNull
+import kotlinx.coroutines.flow.Flow
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
 
@@ -20,7 +17,7 @@ class AppConfigurationRepositoryHelper(
 ) {
 
     suspend fun save(request: AppConfigurationRequest): AppConfiguration {
-        return appConfigurationRepository.save(request.toEntity()).awaitFirst()
+        return appConfigurationRepository.save(request.toEntity())
     }
 
     suspend fun update(id: String, request: AppConfigurationRequest): AppConfiguration {
@@ -28,28 +25,27 @@ class AppConfigurationRepositoryHelper(
             key = request.key,
             value = request.value,
             section = request.section,
-        ).let(appConfigurationRepository::save).awaitFirst()
+        ).let { appConfigurationRepository.save(it) }
     }
 
-    suspend fun findAll(): List<AppConfiguration> {
-        return appConfigurationRepository.findAll().collectList().awaitSingle()
+    suspend fun findAll(): Flow<AppConfiguration> {
+        return appConfigurationRepository.findAll()
     }
 
     suspend fun deleteById(id: String) {
         val current = findByIdOrThrow(id)
         appConfigurationRepository.delete(current)
-            .awaitSingleOrNull()
     }
 
     suspend fun findByKeyAndSection(key: String, section: String): AppConfiguration {
-        return appConfigurationRepository.findByKeyAndSection(key, section).awaitFirstOrElse {
-            throw AppException(NOT_FOUND_MESSAGE, NOT_FOUND)
-        }
+        return appConfigurationRepository.findByKeyAndSection(key, section) ?: throw AppException(
+            NOT_FOUND_MESSAGE,
+            NOT_FOUND
+        )
+
     }
 
     private suspend fun findByIdOrThrow(id: String): AppConfiguration {
-        return appConfigurationRepository.findById(id).awaitFirstOrElse {
-            throw AppException(NOT_FOUND_MESSAGE, NOT_FOUND)
-        }
+        return appConfigurationRepository.findById(id) ?: throw AppException(NOT_FOUND_MESSAGE, NOT_FOUND)
     }
 }

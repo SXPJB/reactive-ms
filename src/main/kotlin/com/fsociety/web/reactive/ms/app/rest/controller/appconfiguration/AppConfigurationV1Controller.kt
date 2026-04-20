@@ -3,9 +3,17 @@ package com.fsociety.web.reactive.ms.app.rest.controller.appconfiguration
 import com.fsociety.web.reactive.ms.common.request.AppConfigurationRequest
 import com.fsociety.web.reactive.ms.common.response.AppConfigurationResponse
 import com.fsociety.web.reactive.ms.core.service.AppConfigurationService
+import kotlinx.coroutines.flow.Flow
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.http.ResponseEntity
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
 
 
 @RestController
@@ -32,7 +40,7 @@ class AppConfigurationV1Controller(
     }
 
     @GetMapping("/all")
-    suspend fun findAll(): ResponseEntity<List<AppConfigurationResponse>> {
+    suspend fun findAll(): ResponseEntity<Flow<AppConfigurationResponse>> {
         return ResponseEntity.ok(appConfigurationService.findAll())
     }
 
