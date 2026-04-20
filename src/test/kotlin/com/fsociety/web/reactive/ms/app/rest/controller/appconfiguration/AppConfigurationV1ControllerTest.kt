@@ -55,7 +55,6 @@ class AppConfigurationV1ControllerTest(
     @BeforeEach
     suspend fun setupDb() {
         appConfigurationRepository.deleteAll()
-            .awaitSingleOrNull()
     }
 
     private fun url(path: String) = "http://localhost:$port$path"
