@@ -1,5 +1,15 @@
 services:
-  mongo:
-    image: mongo:6.0.2-focal
+  rds:
+    image: postgres:18-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=localuser
+      - POSTGRES_PASSWORD=localpass
+      - POSTGRES_DB=reactive-data
     ports:
-      - "27017:27017"
+      - "5432:5432"
+    volumes:
+      - db:/var/lib/postgresql/data
+volumes:
+  db:
+    driver: local

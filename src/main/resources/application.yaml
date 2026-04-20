@@ -13,14 +13,16 @@ spring:
   web:
     locale: ${APP_LOCALE:en}
     locale-resolver: fixed
+  r2dbc:
+    url: r2dbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:reactive-data}
+    username: ${DB_USER:localuser}
+    password: ${DB_PASS:localpass}
 
-  data:
-    mongodb:
-      field-naming-strategy: org.springframework.data.mapping.model.SnakeCaseFieldNamingStrategy
-      auto-index-creation: true
-  mongodb:
-    uri: mongodb://localhost:27017
-    database: reactive-mongo
+  liquibase:
+    change-log: classpath:db/changelog/db.changelog-master.yaml
+    url: jdbc:postgresql:////${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:reactive-data}
+    user: ${DB_USER:localuser}
+    password: ${DB_PASS:localpass}
 
 logging:
   level:

@@ -5,14 +5,15 @@ import com.fsociety.web.reactive.ms.common.request.AppConfigurationRequest
 import com.fsociety.web.reactive.ms.common.request.AppConfigurationRequest.Companion.toEntity
 import com.fsociety.web.reactive.ms.domain.entity.AppConfiguration
 import com.fsociety.web.reactive.ms.domain.repository.AppConfigurationRepository
-import kotlinx.coroutines.reactive.awaitFirst
 import kotlinx.coroutines.reactive.awaitFirstOrElse
-import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.reactor.awaitSingle
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.stereotype.Component
+import java.util.*
 
-private val NOT_FOUND_MESSAGE = "Not found app configuration"
+private const val NOT_FOUND_MESSAGE = "Not found app configuration"
+private const val UUID_ERROR_MESSAGE = "Invalid UUID"
 
 @Component
 class AppConfigurationRepositoryHelper(
@@ -20,15 +21,16 @@ class AppConfigurationRepositoryHelper(
 ) {
 
     suspend fun save(request: AppConfigurationRequest): AppConfiguration {
-        return appConfigurationRepository.save(request.toEntity()).awaitFirst()
+        val entity = request.toEntity()
+        return appConfigurationRepository.save(entity).awaitSingle()
     }
 
     suspend fun update(id: String, request: AppConfigurationRequest): AppConfiguration {
-        return findByIdOrThrow(id).copy(
-            key = request.key,
-            value = request.value,
-            section = request.section,
-        ).let(appConfigurationRepository::save).awaitFirst()
+        return findByIdOrThrow(id).apply {
+            value = request.value
+            key = request.key
+            section = request.section
+        }.let(appConfigurationRepository::save).awaitSingle()
     }
 
     suspend fun findAll(): List<AppConfiguration> {
@@ -48,8 +50,14 @@ class AppConfigurationRepositoryHelper(
     }
 
     private suspend fun findByIdOrThrow(id: String): AppConfiguration {
-        return appConfigurationRepository.findById(id).awaitFirstOrElse {
+        return appConfigurationRepository.findById(id.toUUID()).awaitFirstOrElse {
             throw AppException(NOT_FOUND_MESSAGE, NOT_FOUND)
         }
+    }
+
+    private fun String.toUUID() = runCatching {
+        UUID.fromString(this)
+    }.getOrElse {
+        throw AppException(UUID_ERROR_MESSAGE)
     }
 }
